@@ -1,0 +1,29 @@
+services:
+  hospital-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: hospital-management-system:latest
+    container_name: hospital_app
+    restart: unless-stopped
+    ports:
+      - "80:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - HOST=0.0.0.0
+      - JWT_SECRET=${JWT_SECRET:-hospital-production-jwt-secret-key-change-in-prod}
+      - DB_PATH=/app/data/hospital.db
+    volumes:
+      - hospital_data:/app/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+
+volumes:
+  hospital_data:
+    driver: local
+

@@ -1,0 +1,11 @@
+.git
+.gitignore
+.DS_Store
+tests/
+node_modules/
+*.log
+deploy/
+.env
+.env.local
+.gemini
+

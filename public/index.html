@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Metropolitan General - HealthTech Hospital Management System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏥</text></svg>">
+</head>
+<body>
+  <div id="app-root">
+
+    <!-- Left Navigation Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-icon">🏥</div>
+        <div class="brand-text">
+          <h1>Metro General</h1>
+          <span>Hospital System</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section-title">Clinical Operations</div>
+        <button class="nav-item active" data-view="dashboard" onclick="App.navigate('dashboard')">
+          <span class="icon">📊</span>
+          <span>Dashboard</span>
+        </button>
+        <button class="nav-item" data-view="patients" onclick="App.navigate('patients')">
+          <span class="icon">👥</span>
+          <span>Patients</span>
+        </button>
+        <button class="nav-item" data-view="doctors" onclick="App.navigate('doctors')">
+          <span class="icon">🩺</span>
+          <span>Doctors</span>
+        </button>
+        <button class="nav-item" data-view="appointments" onclick="App.navigate('appointments')">
+          <span class="icon">📅</span>
+          <span>Appointments</span>
+        </button>
+
+        <div class="nav-section-title">Facility & Care</div>
+        <button class="nav-item" data-view="departments" onclick="App.navigate('departments')">
+          <span class="icon">🏥</span>
+          <span>Departments</span>
+        </button>
+        <button class="nav-item" data-view="lab" onclick="App.navigate('lab')">
+          <span class="icon">🔬</span>
+          <span>Laboratory</span>
+        </button>
+        <button class="nav-item" data-view="pharmacy" onclick="App.navigate('pharmacy')">
+          <span class="icon">💊</span>
+          <span>Pharmacy</span>
+        </button>
+        <button class="nav-item" data-view="staff" onclick="App.navigate('staff')">
+          <span class="icon">💼</span>
+          <span>Staff & Roster</span>
+        </button>
+
+        <div class="nav-section-title">Finance & Governance</div>
+        <button class="nav-item" data-view="billing" onclick="App.navigate('billing')">
+          <span class="icon">💳</span>
+          <span>Billing & Claims</span>
+        </button>
+        <button class="nav-item" data-view="admin" onclick="App.navigate('admin')">
+          <span class="icon">⚙️</span>
+          <span>Administration</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-snippet">
+          <div class="user-avatar" id="sidebar-user-avatar">A</div>
+          <div class="user-info">
+            <div class="user-name" id="sidebar-user-name">Dr. Arthur Vance</div>
+            <span class="user-role-badge" id="sidebar-user-role">ADMIN</span>
+          </div>
+          <button class="btn btn-secondary btn-sm" onclick="api.auth.logout()" title="Sign Out" style="padding: 4px 8px;">
+            🚪
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="main-wrapper">
+      
+      <!-- Topbar Header -->
+      <header class="topbar" id="topbar">
+        <div class="topbar-left">
+          <h2 class="page-title" id="page-title">Executive Dashboard</h2>
+        </div>
+
+        <div class="topbar-right">
+          <!-- One-Click Demo Role Switcher -->
+          <div class="role-switcher-container">
+            <span class="role-switcher-label">🎭 Persona:</span>
+            <select id="role-switcher-select" class="role-switcher-select" onchange="App.handleRoleSwitch(this.value)">
+              <option value="admin@hospital.org">👑 Admin (Hospital Director)</option>
+              <option value="doctor.chen@hospital.org">🩺 Doctor (Dr. Emily Chen, Cardio)</option>
+              <option value="staff.nurse@hospital.org">📋 Nurse (Clara Barton)</option>
+              <option value="accountant@hospital.org">💳 Accountant (Patricia Mills)</option>
+              <option value="patient.doe@hospital.org">👤 Patient (Eleanor Vance)</option>
+            </select>
+          </div>
+
+          <!-- Emergency Hotline Pill -->
+          <div style="background: #fef2f2; color: #991b1b; padding: 0.35rem 0.75rem; border-radius: 9999px; font-size: 0.775rem; font-weight: 700; border: 1px solid #fee2e2; display: flex; align-items: center; gap: 0.4rem;">
+            <span>🚨 Hotline: 911 / (555) 911-0000</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- Viewport Content Area -->
+      <main class="viewport-content" id="viewport-content">
+        <!-- Injected dynamically by App.navigate() -->
+      </main>
+
+    </div>
+
+  </div>
+
+  <!-- Dynamic Modal Overlay -->
+  <div class="modal-overlay" id="dynamic-modal">
+    <div class="modal-container" id="dynamic-modal-content">
+      <!-- Injected dynamically -->
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container"></div>
+
+  <!-- Application Scripts -->
+  <script src="/js/api.js"></script>
+  <script src="/js/views/login.view.js"></script>
+  <script src="/js/views/dashboard.view.js"></script>
+  <script src="/js/views/patients.view.js"></script>
+  <script src="/js/views/doctors.view.js"></script>
+  <script src="/js/views/appointments.view.js"></script>
+  <script src="/js/views/departments.view.js"></script>
+  <script src="/js/views/lab.view.js"></script>
+  <script src="/js/views/pharmacy.view.js"></script>
+  <script src="/js/views/staff.view.js"></script>
+  <script src="/js/views/billing.view.js"></script>
+  <script src="/js/views/admin.view.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>
+

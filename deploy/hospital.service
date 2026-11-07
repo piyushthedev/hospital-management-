@@ -1,0 +1,21 @@
+[Unit]
+Description=Modular Hospital Management System
+Documentation=https://github.com/your-org/hospital-management-system
+After=network.target
+
+[Service]
+Type=simple
+User=hospital
+Group=hospital
+WorkingDirectory=/opt/hospital-management-system
+EnvironmentFile=/opt/hospital-management-system/.env
+ExecStart=/usr/bin/node /opt/hospital-management-system/server.js
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target
+

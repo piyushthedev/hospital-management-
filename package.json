@@ -1,0 +1,23 @@
+{
+  "name": "hospital-management-system",
+  "version": "1.0.0",
+  "description": "Modular Hospital Management System supporting Hospital Administration, Patient Management, Doctor Management, Appointments, Departments, Staff, Billing, and Authentication",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test --test-concurrency=1 tests/*.test.js"
+  },
+  "keywords": [
+    "hospital-management-system",
+    "healthcare",
+    "modular",
+    "ehr",
+    "emr",
+    "appointments",
+    "billing",
+    "patients",
+    "doctors"
+  ],
+  "author": "Antigravity Engineering",
+  "license": "MIT"
+}
