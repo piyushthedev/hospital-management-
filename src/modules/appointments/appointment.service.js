@@ -52,7 +52,7 @@ class AppointmentService {
   }
 
   create(data, user) {
-    const {
+    let {
       patient_id,
       doctor_id,
       appointment_date,
@@ -66,17 +66,49 @@ class AppointmentService {
       throw new Error('Patient, doctor, appointment date, and time slot are required');
     }
 
-    const patient = this.db.prepare('SELECT id, name FROM patients WHERE id = ?').get(patient_id);
+    // Normalize date format if provided as DD/MM/YYYY
+    if (typeof appointment_date === 'string' && appointment_date.includes('/')) {
+      const parts = appointment_date.trim().split('/');
+      if (parts.length === 3 && parts[2].length === 4) {
+        appointment_date = `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+      }
+    }
+
+    // Flexible patient lookup by ID, MRN regex, or name
+    let patient = this.db.prepare('SELECT id, name FROM patients WHERE id = ?').get(patient_id);
+    if (!patient) {
+      const mrnMatch = String(patient_id).match(/PAT-[A-Za-z0-9-]+/);
+      if (mrnMatch) {
+        patient = this.db.prepare('SELECT id, name FROM patients WHERE id = ?').get(mrnMatch[0]);
+      }
+    }
+    if (!patient) {
+      patient = this.db.prepare('SELECT id, name FROM patients WHERE name = ? COLLATE NOCASE').get(patient_id);
+    }
     if (!patient) throw new Error(`Patient '${patient_id}' not found`);
 
-    const doctor = this.db.prepare('SELECT id, name, department_id, department_name, consultation_fee FROM doctors WHERE id = ?').get(doctor_id);
+    // Flexible doctor lookup by ID, DOC code regex, or name
+    let doctor = this.db.prepare('SELECT id, name, department_id, department_name, consultation_fee FROM doctors WHERE id = ?').get(doctor_id);
+    if (!doctor) {
+      const docMatch = String(doctor_id).match(/DOC-[A-Za-z0-9-]+/);
+      if (docMatch) {
+        doctor = this.db.prepare('SELECT id, name, department_id, department_name, consultation_fee FROM doctors WHERE id = ?').get(docMatch[0]);
+      }
+    }
+    if (!doctor) {
+      doctor = this.db.prepare('SELECT id, name, department_id, department_name, consultation_fee FROM doctors WHERE name = ? COLLATE NOCASE').get(doctor_id);
+    }
+    if (!doctor) {
+      const cleanName = String(doctor_id).split('-')[0].trim();
+      doctor = this.db.prepare('SELECT id, name, department_id, department_name, consultation_fee FROM doctors WHERE name LIKE ?').get(`%${cleanName}%`);
+    }
     if (!doctor) throw new Error(`Doctor '${doctor_id}' not found`);
 
     // Check conflict: Is the doctor already booked for this slot?
     const conflict = this.db.prepare(`
       SELECT id, patient_name FROM appointments 
       WHERE doctor_id = ? AND appointment_date = ? AND time_slot = ? AND status NOT IN ('cancelled', 'no_show')
-    `).get(doctor_id, appointment_date, time_slot);
+    `).get(doctor.id, appointment_date, time_slot);
 
     if (conflict) {
       throw new Error(`Doctor ${doctor.name} already has a confirmed appointment at ${time_slot} on ${appointment_date}`);
