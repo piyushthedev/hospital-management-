@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# AWS EC2 Automated User Data Deployment Script
-# Supports: Ubuntu 22.04/24.04 LTS & Amazon Linux 2023
+# Cloud-Init Bootstrap Script for Linux & Oracle Cloud Infrastructure (OCI)
+# Supports: Ubuntu 20.04/22.04/24.04 LTS & Debian/RHEL
 # Purpose: Automatically provisions Node.js 22 LTS, Nginx, Systemd, and HMS
 # ==============================================================================
 
 set -euo pipefail
-exec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1
+exec > >(tee /var/log/cloud-init-hms.log|logger -t cloud-init-hms -s 2>/dev/console) 2>&1
 
-echo ">>> [HMS-DEPLOY] Starting AWS EC2 Automated Deployment..."
+echo ">>> [HMS-DEPLOY] Starting Cloud VM Automated Deployment..."
 
 APP_DIR="/opt/hospital-management-system"
 APP_USER="hospital"
@@ -26,7 +26,7 @@ echo ">>> [HMS-DEPLOY] Detected OS: $OS"
 if [[ "$OS" == "ubuntu" || "$OS" == "debian" ]]; then
     export DEBIAN_FRONTEND=noninteractive
     apt-get update -y
-    apt-get install -y curl git nginx ufw ca-certificates gnupg
+    apt-get install -y curl git nginx ufw ca-certificates gnupg iptables-persistent netfilter-persistent
 
     # Install Node.js 22.x LTS via NodeSource
     mkdir -p /etc/apt/keyrings
@@ -34,14 +34,20 @@ if [[ "$OS" == "ubuntu" || "$OS" == "debian" ]]; then
     echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_22.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list
     apt-get update -y
     apt-get install -y nodejs
-elif [[ "$OS" == "al2023" || "$OS" == "amzn" ]]; then
+
+    # Ensure Oracle Cloud / Linux host firewall opens port 80 & 443
+    iptables -I INPUT 6 -m state --state NEW -p tcp --dport 80 -j ACCEPT || true
+    iptables -I INPUT 6 -m state --state NEW -p tcp --dport 443 -j ACCEPT || true
+    netfilter-persistent save || true
+elif [[ "$OS" == "rhel" || "$OS" == "centos" || "$OS" == "fedora" || "$OS" == "ol" ]]; then
     dnf update -y
     dnf install -y curl git nginx
-    # Install Node.js 22
-    dnf install -y nodejs22 || dnf install -y nodejs
+    dnf install -y nodejs || true
+    firewall-cmd --permanent --add-service=http || true
+    firewall-cmd --permanent --add-service=https || true
+    firewall-cmd --reload || true
 fi
 
-node -v
 echo ">>> [HMS-DEPLOY] Node.js version installed: $(node -v)"
 
 # 2. Create dedicated service user
@@ -147,5 +153,4 @@ systemctl restart nginx
 systemctl enable nginx
 
 echo ">>> [HMS-DEPLOY] Nginx configured and running."
-echo ">>> [HMS-DEPLOY] Server setup completed. Copy your application files to $APP_DIR and execute: systemctl start hospital"
-
+echo ">>> [HMS-DEPLOY] Server setup completed. Copy application files to $APP_DIR and execute: systemctl start hospital"

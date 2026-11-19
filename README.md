@@ -385,30 +385,26 @@ This project is licensed under the MIT License.
 
 ---
 
-## ☁️ AWS Cloud Deployment
+## ☁️ Cloud & Production Deployment
 
-The application is pre-configured for AWS production hosting (EC2, Lightsail, App Runner, or ECS) with zero external runtime dependencies.
+The application is pre-configured for production hosting (Oracle Cloud Infrastructure / OCI, Linux VPS, or Docker) with zero external runtime dependencies.
 
-### 🚀 1-Minute Launch on AWS EC2 or Lightsail via Docker Compose
+### 🚀 1-Minute Launch via Docker Compose
 
-1. **Launch an EC2 Instance** (Ubuntu 24.04 LTS or Amazon Linux 2023, `t4g.small` or `t3.micro`).
-2. **Open Inbound Security Group Ports**:
-   - `HTTP (80)` and `HTTPS (443)` from anywhere (`0.0.0.0/0`)
-   - `SSH (22)` from your IP
-3. **SSH into the instance**:
+1. **SSH into your cloud server**:
    ```bash
-   ssh -i hospital-key.pem ubuntu@<YOUR-EC2-PUBLIC-IP>
+   ssh -i /path/to/key.key ubuntu@<YOUR-SERVER-PUBLIC-IP>
    ```
-4. **Deploy with Docker Compose**:
+2. **Deploy with Docker Compose**:
    ```bash
-   git clone <YOUR-REPO-URL> /opt/hospital-management-system
+   git clone https://github.com/piyushthedev/hospital-management-.git /opt/hospital-management-system
    cd /opt/hospital-management-system
    docker compose up -d
    ```
-5. **Access the portal**: Open `http://<YOUR-EC2-PUBLIC-IP>` in your browser.
+3. **Access the portal**: Open `http://<YOUR-SERVER-PUBLIC-IP>` in your browser.
 
-### 📚 Full AWS Production Guide
-Detailed instructions for Automated EC2 User Data, Let's Encrypt Free SSL/HTTPS, Nginx reverse proxy configuration, and S3 automated database backup scripts are documented in [**`deploy/AWS_DEPLOYMENT_GUIDE.md`**](deploy/AWS_DEPLOYMENT_GUIDE.md).
+### 📚 Full Production & Oracle Cloud Guide
+Detailed instructions for Automated Cloud-Init, Let's Encrypt Free SSL/HTTPS, Nginx reverse proxy, and automated database backups are documented in [**`deploy/DEPLOYMENT_GUIDE.md`**](deploy/DEPLOYMENT_GUIDE.md).
 
 ---
 
